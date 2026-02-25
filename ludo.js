@@ -4,11 +4,41 @@ const BOARD_SIZE = 600;
 
 // 颜色定义
 const COLORS = {
-    red: { main: '#e74c3c', light: '#fadbd8', dark: '#c0392b', emoji: '🔴', name: '红色' },
-    yellow: { main: '#f39c12', light: '#fdebd0', dark: '#d68910', emoji: '🟡', name: '黄色' },
-    blue: { main: '#3498db', light: '#d6eaf8', dark: '#2980b9', emoji: '🔵', name: '蓝色' },
-    green: { main: '#27ae60', light: '#d5f4e6', dark: '#229954', emoji: '🟢', name: '绿色' }
+    red: { main: '#e74c3c', light: '#fadbd8', dark: '#c0392b', emoji: '🔴', name: '红色', nameEn: 'Red' },
+    yellow: { main: '#f39c12', light: '#fdebd0', dark: '#d68910', emoji: '🟡', name: '黄色', nameEn: 'Yellow' },
+    blue: { main: '#3498db', light: '#d6eaf8', dark: '#2980b9', emoji: '🔵', name: '蓝色', nameEn: 'Blue' },
+    green: { main: '#27ae60', light: '#d5f4e6', dark: '#229954', emoji: '🟢', name: '绿色', nameEn: 'Green' }
 };
+
+// 翻译辅助函数
+function t(key, ...args) {
+    if (typeof window !== 'undefined' && window.t) {
+        return window.t(key, ...args);
+    }
+    // 默认返回中文
+    const fallback = {
+        rolledDice: (emoji, value) => `${emoji}掷出了 ${value} 点！`,
+        needSixToTakeOff: '需要掷出6才能起飞',
+        selectPiece: (count) => `请选择棋子移动 (${count}个可选)`,
+        rolledSix: '掷出6点！再掷一次',
+        reachedFinish: '到达终点！🎉',
+        playerWins: (emoji) => `🎊 ${emoji}玩家获胜！🎊`,
+        flyingShortcut: '✈️ 飞行通道！',
+        colorJump: (emoji, name) => `${emoji}停在${name}格子上，飞跃！`,
+        captured: (emoji) => `⚔️ 吃掉了${emoji}的棋子！`,
+        noMovable: '没有可移动的棋子',
+        planeTakeOff: '飞机起飞到起点！',
+        bounceBack: (excess) => `超过终点，弹回${excess}步！↩️`
+    };
+    if (fallback[key]) {
+        const fn = fallback[key];
+        if (typeof fn === 'function') {
+            return fn(...args);
+        }
+        return fn;
+    }
+    return key;
+}
 
 // 所有玩家颜色列表（用于布局和初始化）
 const ALL_COLORS = ['red', 'yellow', 'blue', 'green'];
@@ -431,7 +461,7 @@ function rollDice(color) {
         dice.classList.remove('rolling');
         gameState.diceRolled = true;
 
-        updateMessage(`${COLORS[currentPlayerColor].emoji}掷出了 ${gameState.diceValue} 点！`);
+        updateMessage(t('rolledDice', COLORS[currentPlayerColor].emoji, gameState.diceValue));
 
         setTimeout(() => checkMovablePieces(), 300);
     }, 500);
@@ -460,12 +490,12 @@ function checkMovablePieces() {
     });
 
     if (movable.length === 0) {
-        updateMessage('没有可移动的棋子');
+        updateMessage(t('noMovable'));
         setTimeout(nextPlayer, 1500);
     } else if (movable.length === 1) {
         setTimeout(() => movePiece(movable[0]), 500);
     } else {
-        updateMessage(`请选择棋子移动 (${movable.length}个可选)`);
+        updateMessage(t('selectPiece', movable.length));
         movable.forEach(index => {
             const element = gameState.pieceElements[`${currentColor}-${index}`];
             if (element) element.classList.add('selectable');
@@ -494,7 +524,7 @@ function movePiece(pieceIndex) {
     if (piece.position === -1) {
         piece.position = 0;
         movePieceTo(currentColor, pieceIndex);
-        updateMessage('飞机起飞到起点！');
+        updateMessage(t('planeTakeOff'));
         updatePiecesStatus();
 
         setTimeout(() => {
@@ -502,7 +532,7 @@ function movePiece(pieceIndex) {
             if (gameState.diceValue === 6 && !gameState.gameOver) {
                 gameState.diceRolled = false;
                 enableCurrentPlayerDice();
-                updateMessage('掷出6点！再掷一次');
+                updateMessage(t('rolledSix'));
             } else if (!gameState.gameOver) {
                 setTimeout(nextPlayer, 500);
             }
@@ -542,14 +572,14 @@ function movePiece(pieceIndex) {
             piece.position = newPosition;
             piece.finished = true;
             movePieceTo(currentColor, pieceIndex);
-            updateMessage('到达终点！🎉');
+            updateMessage(t('reachedFinish'));
             updatePiecesStatus();
             checkWin(currentColor);
 
             if (gameState.diceValue === 6 && !gameState.gameOver) {
                 gameState.diceRolled = false;
                 enableCurrentPlayerDice();
-                updateMessage('掷出6点！再掷一次');
+                updateMessage(t('rolledSix'));
             } else if (!gameState.gameOver) {
                 setTimeout(nextPlayer, 1000);
             }
@@ -564,7 +594,7 @@ function movePiece(pieceIndex) {
             piece.position = stepsToEntry + 1 + bounceBackStepIndex;
 
             movePieceTo(currentColor, pieceIndex);
-            updateMessage(`超过终点，弹回${excess}步！↩️`);
+            updateMessage(t('bounceBack', excess));
             updatePiecesStatus();
 
             setTimeout(() => {
@@ -573,7 +603,7 @@ function movePiece(pieceIndex) {
                 if (gameState.diceValue === 6 && !gameState.gameOver) {
                     gameState.diceRolled = false;
                     enableCurrentPlayerDice();
-                    updateMessage('掷出6点！再掷一次');
+                    updateMessage(t('rolledSix'));
                 } else if (!gameState.gameOver) {
                     setTimeout(nextPlayer, 500);
                 }
@@ -594,9 +624,10 @@ function movePiece(pieceIndex) {
         if (shortcutResult.shouldFly) {
             // 触发飞行
             if (shortcutResult.flyType === 'shortcut') {
-                updateMessage(`${COLORS[currentColor].emoji}触发飞行通道！✈️`);
+                updateMessage(`${COLORS[currentColor].emoji} ${t('flyingShortcut')}`);
             } else if (shortcutResult.flyType === 'color') {
-                updateMessage(`${COLORS[currentColor].emoji}停在${COLORS[currentColor].name}格子上，飞跃！✈️`);
+                const colorName = currentLang === 'en' ? COLORS[currentColor].nameEn : COLORS[currentColor].name;
+                updateMessage(t('colorJump', COLORS[currentColor].emoji, colorName));
             }
 
             setTimeout(() => {
@@ -613,7 +644,7 @@ function movePiece(pieceIndex) {
                         const secondCheck = checkShortcut(currentColor, pieceIndex);
                         if (secondCheck.shouldFly && secondCheck.flyType === 'shortcut') {
                             // 触发飞行通道
-                            updateMessage(`${COLORS[currentColor].emoji}触发飞行通道！✈️`);
+                            updateMessage(`${COLORS[currentColor].emoji} ${t('flyingShortcut')}`);
                             setTimeout(() => {
                                 piece.position = secondCheck.newPosition;
                                 movePieceTo(currentColor, pieceIndex);
@@ -623,7 +654,7 @@ function movePiece(pieceIndex) {
                                     if (gameState.diceValue === 6 && !gameState.gameOver) {
                                         gameState.diceRolled = false;
                                         enableCurrentPlayerDice();
-                                        updateMessage('掷出6点！再掷一次');
+                                        updateMessage(t('rolledSix'));
                                     } else if (!gameState.gameOver) {
                                         setTimeout(nextPlayer, 500);
                                     }
@@ -636,7 +667,7 @@ function movePiece(pieceIndex) {
                                 if (gameState.diceValue === 6 && !gameState.gameOver) {
                                     gameState.diceRolled = false;
                                     enableCurrentPlayerDice();
-                                    updateMessage('掷出6点！再掷一次');
+                                    updateMessage(t('rolledSix'));
                                 } else if (!gameState.gameOver) {
                                     setTimeout(nextPlayer, 500);
                                 }
@@ -777,7 +808,7 @@ function checkCapture(color, pieceIndex) {
             if (currentIndex === otherIndex) {
                 otherPiece.position = -1;
                 movePieceTo(playerColor, idx, false);
-                updateMessage(`${COLORS[color].emoji}击落了${COLORS[playerColor].emoji}！`);
+                updateMessage(`${COLORS[color].emoji} ${t('captured', COLORS[playerColor].emoji)}`);
                 updatePiecesStatus();
             }
         });
@@ -789,7 +820,7 @@ function checkWin(color) {
     const allFinished = gameState.pieces[color].every(p => p.finished);
     if (allFinished) {
         gameState.gameOver = true;
-        updateMessage(`🎊 ${COLORS[color].emoji}玩家获胜！🎊`);
+        updateMessage(t('playerWins', COLORS[color].emoji));
 
         // 禁用所有色子按钮
         gameState.activePlayers.forEach(playerColor => {

@@ -621,7 +621,20 @@
                 bluePlayer: '🔵 蓝色玩家',
                 greenPlayer: '🟢 绿色玩家',
                 rollDice: '掷骰子',
-                selectPlayersToStart: '选择玩家开始游戏！'
+                selectPlayersToStart: '选择玩家开始游戏！',
+                // 游戏内消息
+                rolledDice: (emoji, value) => `${emoji}掷出了 ${value} 点！`,
+                needSixToTakeOff: '需要掷出6才能起飞',
+                selectPiece: (count) => `请选择棋子移动 (${count}个可选)`,
+                rolledSix: '掷出6点！再掷一次',
+                reachedFinish: '到达终点！🎉',
+                playerWins: (emoji) => `🎊 ${emoji}玩家获胜！🎊`,
+                flyingShortcut: '✈️ 飞行通道！',
+                colorJump: (emoji, name) => `${emoji}停在${name}格子上，飞跃！`,
+                captured: (emoji) => `⚔️ 吃掉了${emoji}的棋子！`,
+                noMovable: '没有可移动的棋子',
+                planeTakeOff: '飞机起飞到起点！',
+                bounceBack: (excess) => `超过终点，弹回${excess}步！↩️'
             },
             en: {
                 gameTitle: '🎲 Chinese Ludo 🎲',
@@ -636,13 +649,32 @@
                 bluePlayer: '🔵 Blue Player',
                 greenPlayer: '🟢 Green Player',
                 rollDice: 'Roll Dice',
-                selectPlayersToStart: 'Select players to start!'
+                selectPlayersToStart: 'Select players to start!',
+                // 游戏内消息
+                rolledDice: (emoji, value) => `${emoji} rolled ${value}!`,
+                needSixToTakeOff: 'Need 6 to take off',
+                selectPiece: (count) => `Select a piece to move (${count} available)`,
+                rolledSix: 'Rolled 6! Roll again',
+                reachedFinish: 'Reached finish! 🎉',
+                playerWins: (emoji) => `🎊 ${emoji} Player wins! 🎊`,
+                flyingShortcut: '✈️ Flying shortcut!',
+                colorJump: (emoji, name) => `${emoji} landed on ${name}, jumping!`,
+                captured: (emoji) => `⚔️ Captured ${emoji}'s piece!`,
+                noMovable: 'No movable pieces',
+                planeTakeOff: 'Plane takes off to start!',
+                bounceBack: (excess) => `Bounced back ${excess} steps!↩️`
             }
         };
 
         let currentLang = 'en'; // 默认英文
 
+        // 将翻译函数暴露到全局作用域，供 ludo.js 使用
+        window.t = t;
+        window.currentLang = currentLang;
+
         function switchLanguage(lang) {
+            currentLang = lang;
+            window.currentLang = currentLang; // 更新全局变量
             currentLang = lang;
 
             // 更新按钮状态
@@ -667,6 +699,18 @@
             } else {
                 document.title = '飞行棋 - 小虾米游戏乐园';
             }
+        }
+
+        // 获取翻译文本的辅助函数
+        function t(key, ...args) {
+            if (translations[currentLang] && translations[currentLang][key]) {
+                const translation = translations[currentLang][key];
+                if (typeof translation === 'function') {
+                    return translation(...args);
+                }
+                return translation;
+            }
+            return key;
         }
 
         // 页面加载时应用默认语言
