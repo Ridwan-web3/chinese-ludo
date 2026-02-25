@@ -16,44 +16,71 @@ const ALL_COLORS = ['red', 'yellow', 'blue', 'green'];
 // 游戏中实际参与的玩家（在游戏开始时设置）
 let activePlayers = [];
 
-// 玩家顺序 - 按照顺时针：黄->蓝->红->绿（已废弃，使用 activePlayers）
-const PLAYERS = ['yellow', 'blue', 'red', 'green'];
+// 玩家顺序 - 按照顺时针：红->绿->黄->蓝
+const PLAYERS = ['red', 'green', 'yellow', 'blue'];
 
-// 基地位置 - 用户标注的精确坐标
-// 每个基地有4个圆形停机位
-const HOME_POSITIONS = {
-    yellow: [ // 左上角黄色基地
-        { x: 81, y: 74 },
-        { x: 127, y: 75 },
-        { x: 127, y: 122 },
-        { x: 81, y: 123 }
-    ],
-    blue: [   // 右上角蓝色基地
-        { x: 473, y: 75 },
-        { x: 518, y: 74 },
-        { x: 517, y: 125 },
-        { x: 472, y: 124 }
-    ],
-    red: [    // 右下角红色基地
-        { x: 471, y: 488 },
-        { x: 519, y: 488 },
-        { x: 518, y: 535 },
-        { x: 473, y: 535 }
-    ],
-    green: [  // 左下角绿色基地
-        { x: 82, y: 487 },
-        { x: 126, y: 487 },
-        { x: 81, y: 536 },
-        { x: 126, y: 536 }
-    ]
+// ========== 新的硬编码坐标系统 ==========
+
+// 所有位置的坐标（索引 0-95）
+const POSITIONS = [
+    { x: 56, y: 195 },   { x: 93, y: 180 },   { x: 126, y: 180 },  { x: 163, y: 196 },   // 0-3
+    { x: 194, y: 164 },  { x: 179, y: 128 },  { x: 180, y: 94 },   { x: 194, y: 57 },    // 4-7
+    { x: 231, y: 45 },   { x: 265, y: 44 },   { x: 299, y: 45 },   { x: 334, y: 45 },    // 8-11
+    { x: 367, y: 45 },   { x: 405, y: 57 },   { x: 420, y: 94 },   { x: 420, y: 129 },   // 12-15
+    { x: 404, y: 164 },  { x: 436, y: 196 },  { x: 472, y: 180 },  { x: 505, y: 180 },   // 16-19
+    { x: 542, y: 197 },  { x: 555, y: 232 },  { x: 554, y: 265 },  { x: 555, y: 300 },   // 20-23
+    { x: 555, y: 332 },  { x: 555, y: 367 },  { x: 542, y: 403 },  { x: 505, y: 418 },   // 24-27
+    { x: 472, y: 418 },  { x: 435, y: 404 },  { x: 405, y: 434 },  { x: 420, y: 470 },   // 28-31
+    { x: 421, y: 505 },  { x: 404, y: 541 },  { x: 367, y: 555 },  { x: 333, y: 556 },   // 32-35
+    { x: 298, y: 556 },  { x: 265, y: 555 },  { x: 231, y: 554 },  { x: 193, y: 542 },   // 36-39
+    { x: 178, y: 505 },  { x: 178, y: 471 },  { x: 194, y: 436 },  { x: 164, y: 404 },   // 40-43
+    { x: 125, y: 419 },  { x: 93, y: 419 },   { x: 57, y: 403 },   { x: 43, y: 367 },    // 44-47
+    { x: 43, y: 333 },   { x: 45, y: 299 },   { x: 44, y: 267 },   { x: 45, y: 232 },    // 48-51
+    { x: 93, y: 299 },   { x: 129, y: 299 },  { x: 161, y: 300 },  { x: 195, y: 300 },   // 52-55
+    { x: 229, y: 299 },  { x: 269, y: 300 },                                                                 // 56-57
+    { x: 300, y: 94 },   { x: 298, y: 127 },  { x: 300, y: 162 },  { x: 299, y: 197 },   // 58-61
+    { x: 300, y: 231 },  { x: 299, y: 271 },                                                                 // 62-63
+    { x: 506, y: 301 },  { x: 470, y: 301 },  { x: 437, y: 301 },  { x: 403, y: 301 },   // 64-67
+    { x: 369, y: 299 },  { x: 329, y: 301 },                                                                 // 68-69
+    { x: 299, y: 505 },  { x: 299, y: 471 },  { x: 300, y: 438 },  { x: 298, y: 404 },   // 70-73
+    { x: 300, y: 370 },  { x: 299, y: 331 },                                                                 // 74-75
+    { x: 15, y: 170 },   { x: 429, y: 17 },   { x: 582, y: 430 },  { x: 168, y: 582 },   // 76-79 起飞点
+    { x: 44, y: 45 },    { x: 100, y: 45 },   { x: 45, y: 98 },    { x: 98, y: 96 },    // 80-83 黄色基地
+    { x: 500, y: 44 },   { x: 553, y: 45 },   { x: 500, y: 98 },   { x: 555, y: 99 },   // 84-87 蓝色基地
+    { x: 501, y: 501 },  { x: 555, y: 503 },  { x: 501, y: 554 },  { x: 554, y: 554 },  // 88-91 红色基地
+    { x: 45, y: 501 },   { x: 97, y: 501 },   { x: 44, y: 554 },   { x: 98, y: 554 }    // 92-95 绿色基地
+];
+
+// 起飞点
+const START_POINTS = {
+    yellow: 76,   // 黄色起飞点
+    blue: 77,     // 蓝色起飞点
+    red: 78,      // 红色起飞点
+    green: 79     // 绿色起飞点
 };
 
-// 各颜色起点位置（起飞后第一个停留位置，掷6点后从基地移动到这里）
+// 基地位置（每个颜色4个棋子）
+const HOME_POSITIONS = {
+    yellow: [80, 81, 82, 83],   // 黄色基地：1号-4号棋子
+    blue: [84, 85, 86, 87],     // 蓝色基地：1号-4号棋子
+    red: [88, 89, 90, 91],      // 红色基地：1号-4号棋子
+    green: [92, 93, 94, 95]     // 绿色基地：1号-4号棋子
+};
+
+// 终点通道配置
+const FINISH_CHANNELS = {
+    yellow: { start: 52, end: 57, entry: 49, total: 55 },   // 黄色：52-57，从主路径49进入，总共55步
+    blue: { start: 58, end: 63, entry: 10, total: 56 },     // 蓝色：58-63，从主路径10进入，总共56步
+    red: { start: 64, end: 69, entry: 23, total: 56 },      // 红色：64-69，从主路径23进入，总共56步
+    green: { start: 70, end: 75, entry: 36, total: 56 }     // 绿色：70-75，从主路径36进入，总共56步
+};
+
+// 各颜色起点位置（起飞点）- 方便其他函数使用
 const START_POSITIONS = {
-    yellow: { x: 49, y: 188 },
-    blue: { x: 411, y: 43 },
-    red: { x: 549, y: 424 },
-    green: { x: 188, y: 565 }
+    yellow: { x: 15, y: 170 },
+    blue: { x: 429, y: 17 },
+    red: { x: 582, y: 430 },
+    green: { x: 168, y: 582 }
 };
 
 // 飞行通道配置 - 基于主路径索引
@@ -241,88 +268,82 @@ function isPlayerActive(color) {
 
 // 获取棋子在主路径上的实际索引
 function getMainPathIndex(color, position) {
-    // position >= 1 表示在主路径上走过的步数
-    // position = 1 对应 PATH_START_INDEX[color]
-    // position = 2 对应 PATH_START_INDEX[color] + 1
-    // 以此类推，需要计算循环
-
-    const startIndex = PATH_START_INDEX[color];
-    // position 1 = startIndex, position 2 = startIndex + 1, ...
-    const actualIndex = (startIndex + position - 1) % 52;
+    // 根据颜色确定主路径起点
+    let mainPathStart;
+    switch (color) {
+        case 'yellow': mainPathStart = 0; break;
+        case 'blue': mainPathStart = 13; break;
+        case 'red': mainPathStart = 26; break;
+        case 'green': mainPathStart = 39; break;
+    }
+    // position 1 = mainPathStart, position 2 = mainPathStart + 1, ...
+    const actualIndex = (mainPathStart + position - 1) % 52;
     return actualIndex;
 }
 
 // 检查棋子是否在终点通道上
 function isInFinishStretch(color, position) {
-    const startIndex = PATH_START_INDEX[color];
-    const finishEntry = FINISH_ENTRY_INDEX[color];
-
-    // 计算当前在主路径上的索引
-    let currentSteps = position; // 从起点开始走的步数
-    const actualIndex = (startIndex + currentSteps - 1) % 52;
-
-    // 检查是否已经经过了终点入口
-    // 需要判断从起点走到当前索引是否经过了finishEntry
-    if (finishEntry >= startIndex) {
-        // 终点入口在起点后面（没有跨越循环边界）
-        return actualIndex > finishEntry || currentSteps > (finishEntry - startIndex + 1);
-    } else {
-        // 终点入口在起点前面（跨越了循环边界）
-        // 比如红色从26开始，终点入口是24，需要走到循环之后
-        const stepsToEntry = (52 - startIndex) + finishEntry + 1;
-        return currentSteps > stepsToEntry;
-    }
+    // position > 52 表示进入或超过终点通道
+    return position > 52;
 }
 
 // 获取棋子位置坐标
 function getPieceCoordinates(color, pieceIndex) {
     const piece = gameState.pieces[color][pieceIndex];
+    const finishChannel = FINISH_CHANNELS[color];
 
-    // 在基地
+    // 在基地（未起飞）
     if (piece.position === -1) {
-        return HOME_POSITIONS[color][pieceIndex];
+        const homeIndex = HOME_POSITIONS[color][pieceIndex];
+        return POSITIONS[homeIndex];
     }
 
-    // 在起点位置（刚掷出6点起飞）
-    if (piece.position === 0) {
-        return START_POSITIONS[color];
-    }
-
-    // 已完成 - 返回到基地（停机坪）
+    // 已完成 - 飞回基地对应位置
     if (piece.finished) {
-        // 完成的棋子按顺序回到基地的4个位置
-        const finishedPieces = gameState.pieces[color].filter(p => p.finished);
-        const finishedIndex = finishedPieces.findIndex(p => p === piece);
-        return HOME_POSITIONS[color][finishedIndex];
+        const homeIndex = HOME_POSITIONS[color][pieceIndex];
+        return POSITIONS[homeIndex];
     }
+
+    // 在起飞点（刚起飞，position=0）
+    if (piece.position === 0) {
+        const startPoint = START_POINTS[color];
+        return POSITIONS[startPoint];
+    }
+
+    // 计算当前在主路径上的索引
+    let mainPathStart;
+    switch (color) {
+        case 'yellow': mainPathStart = 0; break;
+        case 'blue': mainPathStart = 13; break;
+        case 'red': mainPathStart = 26; break;
+        case 'green': mainPathStart = 39; break;
+    }
+
+    const currentPathIndex = (mainPathStart + piece.position - 1) % 52;
 
     // 检查是否在终点通道上
-    if (isInFinishStretch(color, piece.position)) {
-        // 计算在终点通道中的位置
-        const startIndex = PATH_START_INDEX[color];
-        const finishEntry = FINISH_ENTRY_INDEX[color];
+    // 计算从起点到终点入口需要走多少步
+    let stepsToEntry;
+    const entryIndex = finishChannel.entry;
 
-        // 计算到达终点入口的步数
-        let stepsToEntry;
-        if (finishEntry >= startIndex) {
-            stepsToEntry = finishEntry - startIndex + 1;
-        } else {
-            stepsToEntry = (52 - startIndex) + finishEntry + 1;
-        }
-
-        // 计算在终点通道中的索引（0-5）
-        const finishIndex = piece.position - stepsToEntry;
-
-        if (finishIndex < 6) {
-            return HOME_STRETCH[color][finishIndex];
-        } else if (piece.position >= 56) {
-            return CENTER_FINISH[color];
-        }
+    if (entryIndex >= mainPathStart) {
+        stepsToEntry = entryIndex - mainPathStart + 1;
+    } else {
+        stepsToEntry = (52 - mainPathStart) + entryIndex + 1;
     }
 
+    // 如果走过的步数超过到达入口的步数，则在终点通道上
+    if (piece.position > stepsToEntry) {
+        const finishStepIndex = piece.position - stepsToEntry - 1; // 在终点通道中的第几步（0-5）
+        const finishIndex = finishChannel.start + finishStepIndex;
+        if (finishIndex <= finishChannel.end) {
+            return POSITIONS[finishIndex];
+        }
+    }
+    // 否则在主路径上（包括终点入口）
+
     // 在主路径上
-    const actualIndex = getMainPathIndex(color, piece.position);
-    return MAIN_PATH[actualIndex];
+    return POSITIONS[currentPathIndex];
 }
 
 // 创建棋子元素
@@ -489,17 +510,37 @@ function movePiece(pieceIndex) {
         return;
     }
 
-    piece.position += gameState.diceValue;
+    const newPosition = piece.position + gameState.diceValue;
+    const finishChannel = FINISH_CHANNELS[currentColor];
 
-    // 到达中心终点（position >= 56）- 走完主路径50步 + 终点通道6格 = 56
-    if (piece.position >= 56) {
-        // 计算超出终点的步数
-        const excess = piece.position - 56;
+    // 计算到达终点入口需要的步数
+    let mainPathStart;
+    switch (currentColor) {
+        case 'yellow': mainPathStart = 0; break;
+        case 'blue': mainPathStart = 13; break;
+        case 'red': mainPathStart = 26; break;
+        case 'green': mainPathStart = 39; break;
+    }
 
-        if (excess === 0) {
+    let stepsToEntry;
+    const entryIndex = finishChannel.entry;
+
+    if (entryIndex >= mainPathStart) {
+        stepsToEntry = entryIndex - mainPathStart + 1;
+    } else {
+        stepsToEntry = (52 - mainPathStart) + entryIndex + 1;
+    }
+
+    // 检查是否进入终点通道
+    if (newPosition > stepsToEntry) {
+        // 进入终点通道，计算在通道中的位置
+        const finishStepIndex = newPosition - stepsToEntry - 1;
+        const finishIndex = finishChannel.start + finishStepIndex;
+
+        if (finishIndex === finishChannel.end) {
             // 刚好到达终点
+            piece.position = newPosition;
             piece.finished = true;
-            piece.position = 56;
             movePieceTo(currentColor, pieceIndex);
             updateMessage('到达终点！🎉');
             updatePiecesStatus();
@@ -513,14 +554,19 @@ function movePiece(pieceIndex) {
                 setTimeout(nextPlayer, 1000);
             }
             return;
-        } else {
-            // 超过终点，弹回规则：从终点往回走
-            piece.position = 56 - excess;
+        } else if (finishIndex > finishChannel.end) {
+            // 超过终点，弹回规则
+            const excess = finishIndex - finishChannel.end;
+            const bounceBackIndex = finishChannel.end - excess;
+
+            // 计算弹回后的position值
+            const bounceBackStepIndex = bounceBackIndex - finishChannel.start;
+            piece.position = stepsToEntry + 1 + bounceBackStepIndex;
+
             movePieceTo(currentColor, pieceIndex);
             updateMessage(`超过终点，弹回${excess}步！↩️`);
             updatePiecesStatus();
 
-            // 弹回后检查击落
             setTimeout(() => {
                 checkCapture(currentColor, pieceIndex);
 
@@ -535,6 +581,8 @@ function movePiece(pieceIndex) {
             return;
         }
     }
+
+    piece.position = newPosition;
 
     movePieceTo(currentColor, pieceIndex);
     updatePiecesStatus();

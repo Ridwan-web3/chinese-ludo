@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinese Ludo - 中国飞行棋</title>
+    <title>飞行棋 - 小虾米游戏乐园</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa07a 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(255, 105, 180, 0.3);
+            text-decoration: none;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(255, 105, 180, 0.4);
         }
 
         h1 {
@@ -486,10 +509,12 @@
     </style>
 </head>
 <body>
+    <a href="../../index.html" class="home-btn">🏠 返回游戏主页</a>
+
     <!-- 玩家选择界面 -->
     <div class="player-select-overlay" id="playerSelectOverlay">
         <div class="player-select-modal">
-            <h2>🎲 中国飞行棋 🎲</h2>
+            <h2>🎲 飞行棋 🎲</h2>
             <p style="margin-bottom: 20px; color: #666;">请选择玩家人数（2-4人）</p>
 
             <div class="player-options">
@@ -502,8 +527,8 @@
                 <button class="player-option-btn" data-players="3" data-colors="red,yellow,blue">
                     🔴🟡🔵 三人游戏<br><small>红黄蓝</small>
                 </button>
-                <button class="player-option-btn" data-players="4" data-colors="red,yellow,blue,green">
-                    🔴🟡🔵🟢 四人游戏<br><small>全部玩家</small>
+                <button class="player-option-btn" data-players="4" data-colors="red,green,yellow,blue">
+                    🔴🟢🟡🔵 四人游戏<br><small>全部玩家</small>
                 </button>
             </div>
 
@@ -512,7 +537,7 @@
     </div>
 
     <!-- 游戏主界面 -->
-    <h1>🎲 中国飞行棋 Chinese Ludo 🎲</h1>
+    <h1>🎲 飞行棋 🎲</h1>
 
     <div class="game-layout">
         <!-- 左侧面板 -->
@@ -537,7 +562,7 @@
         <!-- 中间棋盘和消息 -->
         <div class="center-area">
             <div class="board-container">
-                <img src="img/xx.jpeg" alt="中国飞行棋棋盘 Chinese Ludo Board" id="boardImage">
+                <img src="img/xxx.png" alt="飞行棋棋盘" id="boardImage">
                 <!-- 棋子将通过JavaScript动态添加 -->
             </div>
 
