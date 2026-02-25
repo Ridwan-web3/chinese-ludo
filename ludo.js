@@ -288,6 +288,10 @@ let gameState = {
 
 // 获取当前玩家颜色
 function getCurrentPlayerColor() {
+    if (!gameState.activePlayers || gameState.activePlayers.length === 0) {
+        console.error('No active players!');
+        return null;
+    }
     return gameState.activePlayers[gameState.currentPlayerIndex];
 }
 
@@ -837,12 +841,15 @@ function checkWin(color) {
 // 启用当前玩家的色子按钮
 function enableCurrentPlayerDice() {
     const currentColor = getCurrentPlayerColor();
-    console.log('Enabling dice for:', currentColor);
+    if (!currentColor) {
+        console.error('No current player color found!');
+        return;
+    }
     const rollBtn = document.getElementById(`rollBtn-${currentColor}`);
-    console.log('Roll button found:', rollBtn);
     if (rollBtn) {
         rollBtn.disabled = false;
-        console.log('Roll button disabled state:', rollBtn.disabled);
+    } else {
+        console.error('Roll button not found for:', currentColor);
     }
 }
 
@@ -868,15 +875,17 @@ function nextPlayer() {
 function updateCurrentPlayer() {
     const currentColor = getCurrentPlayerColor();
 
-    // 移除所有面板的 active 状态
-    ALL_COLORS.forEach(color => {
+    // 只移除参与游戏玩家面板的 active 状态
+    gameState.activePlayers.forEach(color => {
         const panel = document.getElementById(`panel-${color}`);
         if (panel) panel.classList.remove('active');
     });
 
     // 激活当前玩家的面板
     const currentPanel = document.getElementById(`panel-${currentColor}`);
-    if (currentPanel) currentPanel.classList.add('active');
+    if (currentPanel) {
+        currentPanel.classList.add('active');
+    }
 }
 
 // 更新消息
@@ -920,12 +929,6 @@ function initGame() {
     updatePiecesStatus();
     // 启用第一个玩家的色子按钮
     enableCurrentPlayerDice();
-
-    // 调试信息
-    console.log('Game initialized');
-    console.log('Active players:', gameState.activePlayers);
-    console.log('Current player index:', gameState.currentPlayerIndex);
-    console.log('Current player color:', getCurrentPlayerColor());
 }
 
 // 玩家选择逻辑
