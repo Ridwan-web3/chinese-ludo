@@ -853,7 +853,7 @@ function nextPlayer() {
     updatePiecesStatus();
 
     const currentColor = getCurrentPlayerColor();
-    updateMessage(`轮到${COLORS[currentColor].emoji}玩家`);
+    updateMessage(t('nextTurn', COLORS[currentColor].emoji));
 
     // 启用当前玩家的色子按钮
     enableCurrentPlayerDice();
@@ -913,6 +913,8 @@ function initGame() {
     initializePieces();
     updateCurrentPlayer();
     updatePiecesStatus();
+    // 启用第一个玩家的色子按钮
+    enableCurrentPlayerDice();
 }
 
 // 玩家选择逻辑
